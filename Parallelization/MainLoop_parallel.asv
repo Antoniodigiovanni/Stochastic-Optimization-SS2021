@@ -1,0 +1,58 @@
+clear;
+load data_farmer_cvar.mat;
+yields = yields(1:50,:);
+S = size(yields,1);
+
+slopes=[];
+values=[];
+points=[];
+time=[];
+ub=[];
+lb=[];
+gap=[]; 
+eps = 0.0001;
+notConverged = 1;
+tildeQ = -inf;
+lambda = 0.2;
+alpha = 0.05;
+Costs = [150 230 260]; %W;C;B
+j=0;
+newSlope = [];
+newValue = [];
+tildeF= [];
+t = [];
+Revenue = [];
+s=1;
+
+tic;
+i = 1;
+[tildeX, ~, optVal] = master_parallel(lambda, Costs, slopes, values, points);
+
+while notConverged
+yalmip('clear');  
+j = j+1;
+fprintf('\n\nLoop n: %f,\n\n', j)
+
+[newValue, newSlope] = recourse_parallel(lambda, yields, tildeX, S, alpha); 
+
+slopes = [slopes, newSlope];
+
+time = [time, toc]; 
+ub = [ub, optVal];
+lb = [lb, (optVal + tildeQ) - newValue]; 
+gap = [gap, abs(1/S*sum(newValue) - tildeQ)]
+fprintf('ub: %f, lb: %f, gap: %f, T: %f\n', ub(end), lb(end), gap(end),toc);
+
+if abs(tildeQ - (1/S) * sum(newValue)) < eps
+    notConverged = false;
+else
+    points = [points, tildeX];
+    values =  [values, newValue(:,1)];
+  
+    i = i +1;
+    [tildeX, theta, optVal] = master_parallel(lambda, Costs, slopes, values, points);
+    tildeQ = 1/S * sum(theta);
+    
+   end 
+
+end
