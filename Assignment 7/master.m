@@ -13,8 +13,6 @@ for i = 1:length(values)
    Cons = [Cons, theta >= values(i) + (x - points(:,i))'  * slopes(:,i)];
 end
 
-%Cons = [Cons, x(4)<=20000000]; %3.1124e+05;
-
 if ~isempty(values)
   obj = (1-lambda) * x(4) - lambda * (Costs * x(1:3)) - theta;
 else
@@ -24,7 +22,7 @@ end
 
 Ops = sdpsettings ('solver','gurobi', 'verbose', 0);
 Result = optimize(Cons, -obj, Ops);
-fprintf('\n\nTheta in the master is equal to: %f\n\n', double(theta))
+
 X = double(x);
 theta = double(theta);
 optVal = double(obj);
