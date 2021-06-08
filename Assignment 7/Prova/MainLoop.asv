@@ -1,6 +1,6 @@
 clear;
 load data_farmer_cvar.mat;
-yields = yields(1:5,:);
+yields = yields(1:4,:);
 S = size(yields,1);
 
 slopes=[];
@@ -51,7 +51,7 @@ lb = [lb, (optVal + tildeQ) - newValue];
 gap = [gap, newValue - tildeQ]; 
 fprintf('ub: %f, lb: %f, gap: %f, T: %f\n', ub(end), lb(end), gap(end),toc);
 
-if abs(tildeQ - (1/S) * sum(newValue)) < eps
+if tildeQ == (1/S) * sum(newValue)
     %newValue == tildeQ
     %newValue - tildeQ < eps
     notConverged = false;
